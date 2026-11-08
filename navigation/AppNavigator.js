@@ -37,7 +37,13 @@ function MainTabs() {
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: '#3D2914' },
+          headerTintColor: '#F7F3EA',
+          contentStyle: { backgroundColor: '#F7F3EA' },
+        }}
+      >
         {/* Tabs are the root. headerShown is false so each tab keeps its own header. */}
         <Stack.Screen
           name="MainTabs"
