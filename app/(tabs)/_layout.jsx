@@ -1,24 +1,29 @@
 // app/(tabs)/_layout.jsx — the bottom tab bar.
-// Each screen in this folder becomes one tab.
-// The theme-toggle button lives in the header here so every tab shows it.
+// Matches the design mockup:
+//   - Dark rich-brown tab bar (#4A1E00)
+//   - Active tab: golden rounded pill with white icon
+//   - Inactive tabs: warm-tan icons + labels
+//   - Home tab has NO nav header (content is inside the ScrollView)
+//   - Other tabs: cream-coloured header to blend with the warm bg
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTheme } from '../../contexts/ThemeContext';
 
-// Map each tab route name to an Ionicons icon (outline = inactive, filled = active).
+// Tab icons  [focused-name, unfocused-name]  — icons from the mockup
 const ICONS = {
-  index:      ['home',               'home-outline'],
-  browse:     ['search',             'search-outline'],
-  favourites: ['heart',              'heart-outline'],
-  categories: ['grid',               'grid-outline'],
-  about:      ['information-circle', 'information-circle-outline'],
+  index:      ['home',    'home-outline'],
+  browse:     ['compass', 'compass-outline'],
+  favourites: ['heart',   'heart-outline'],
+  categories: ['grid',    'grid-outline'],
+  about:      ['person',  'person-outline'],
 };
 
 export default function TabLayout() {
   const { scheme, theme, toggleTheme } = useTheme();
 
+  // Moon/sun toggle — only shown on tabs that have a header.
   function ThemeToggle() {
     return (
       <Pressable
@@ -40,42 +45,47 @@ export default function TabLayout() {
     <Tabs
       screenOptions={({ route }) => {
         const [filled, outline] = ICONS[route.name] ?? ['ellipse', 'ellipse-outline'];
+
         return {
-          // ── Header
-          headerStyle: { backgroundColor: theme.headerBg },
-          headerTintColor: theme.headerText,
-          headerTitleStyle: { fontWeight: '700', letterSpacing: 0.3 },
-          headerRight: () => <ThemeToggle />,
+          // ── Header (cream background to blend with the warm app bg)
+          headerStyle:       { backgroundColor: theme.headerBg },
+          headerTintColor:   theme.headerText,
+          headerTitleStyle:  { fontWeight: '800', fontSize: 17, letterSpacing: 0.2 },
           headerShadowVisible: false,
+          headerRight: () => <ThemeToggle />,
 
           // ── Tab bar
           tabBarStyle: {
             backgroundColor: theme.tabBarBg,
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderTopColor: theme.tabBarBorder,
-            paddingTop: 4,
-            height: 58,
+            borderTopWidth: 0,
+            height: 68,
+            paddingTop: 6,
+            paddingBottom: 10,
           },
-          tabBarActiveTintColor: theme.tabActive,
+          tabBarActiveTintColor:   '#FFFFFF',       // white label on active tab
           tabBarInactiveTintColor: theme.tabInactive,
-          tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginBottom: 4 },
+          tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
 
-          // ── Icon: wrap active icon in a small tinted pill
-          tabBarIcon: ({ focused, color, size }) => (
+          // ── Active icon: golden rounded pill  (matches mockup exactly)
+          tabBarIcon: ({ focused, color, size }) =>
             focused ? (
-              <View style={[styles.iconPill, { backgroundColor: theme.brandLight }]}>
-                <Ionicons name={filled} size={size - 2} color={theme.tabActive} />
+              <View style={[styles.activePill, { backgroundColor: theme.tabActive }]}>
+                <Ionicons name={filled} size={size - 1} color="#FFFFFF" />
               </View>
             ) : (
-              <Ionicons name={outline} size={size - 2} color={color} />
-            )
-          ),
+              <Ionicons name={outline} size={size - 1} color={color} />
+            ),
         };
       }}
     >
-      <Tabs.Screen name="index"      options={{ title: 'Home' }} />
-      <Tabs.Screen name="browse"     options={{ title: 'Browse' }} />
-      <Tabs.Screen name="favourites" options={{ title: 'Favourites' }} />
+      {/* Home — no nav header; the screen renders its own logo + hero */}
+      <Tabs.Screen
+        name="index"
+        options={{ title: 'Home', headerShown: false }}
+      />
+      {/* Renamed Browse → Explore  &  Favourites → Favorites */}
+      <Tabs.Screen name="browse"     options={{ title: 'Explore' }} />
+      <Tabs.Screen name="favourites" options={{ title: 'Favorites' }} />
       <Tabs.Screen name="categories" options={{ title: 'Categories' }} />
       <Tabs.Screen name="about"      options={{ title: 'About' }} />
     </Tabs>
@@ -83,16 +93,14 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  toggleBtn: {
-    marginRight: 16,
-    padding: 4,
-  },
-  iconPill: {
-    width: 36,
-    height: 26,
-    borderRadius: 13,
+  toggleBtn: { marginRight: 16, padding: 4 },
+
+  // Golden pill for the active tab icon — matches mockup
+  activePill: {
+    width: 52,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 2,
   },
 });

@@ -1,68 +1,81 @@
 // One row in a site list. It only displays data.
-// Favourites and "visited" are saved by utils/storage.js, then passed in as props.
-// The image file named on each site is added in a later step; this card uses a
-// coloured left-accent bar with the site initial.
+// The left accent bar colour matches the category tile colours from the mockup
+// so that browsing the list feels visually consistent with the home screen tiles.
 
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 
-// Badge colours differ by meaning so they carry visual weight.
+// ── Per-type accent colours — match the 4 category tile colours ───────────────
+const TYPE_COLORS = {
+  'Buddhist Temple':     '#8B2020',   // maroon red   — Temples tile
+  'Hindu Temple':        '#8B2020',   // same maroon
+  'Archaeological Site': '#1E5C3A',   // forest green — Ancient Cities tile
+  'Fort':                '#B8820A',   // amber gold   — Forts tile
+  'Colonial Heritage':   '#B8820A',   // same amber
+  'Monument':            '#1E5C5C',   // dark teal    — Monuments tile
+  'Nature Reserve':      '#1E5C3A',   // forest green
+  'Mosque':              '#1E5C5C',   // dark teal
+  'Church':              '#1E5C5C',   // dark teal
+};
+
+function getBarColor(type) {
+  return TYPE_COLORS[type] ?? '#8B6240'; // warm brown fallback
+}
+
 function Badge({ label, color, bg }) {
   return (
-    <Text style={[styles.badge, { color, backgroundColor: bg }]}>
-      {label}
-    </Text>
+    <Text style={[styles.badge, { color, backgroundColor: bg }]}>{label}</Text>
   );
 }
 
 export default function SiteCard({ site, onPress, isFavourite, isVisited }) {
   const { theme } = useTheme();
+  const bar = getBarColor(site.type);
 
   return (
     <Pressable
       style={({ pressed }) => [
         styles.card,
-        {
-          backgroundColor: theme.card,
-          borderColor: theme.border,
-          // subtle drop-shadow on iOS; elevation on Android
-          shadowColor: theme.cardShadow,
-        },
+        { backgroundColor: theme.card, borderColor: theme.border, shadowColor: bar },
         pressed && styles.cardPressed,
       ]}
       onPress={() => onPress?.(site)}
     >
-      {/* Left accent column: coloured bar + first-letter initial */}
-      <View style={[styles.accent, { backgroundColor: theme.brand }]}>
+      {/* Left accent bar — coloured by site type */}
+      <View style={[styles.accent, { backgroundColor: bar }]}>
         <Text style={styles.accentLetter}>{site.name.slice(0, 1)}</Text>
       </View>
 
-      {/* Main body */}
+      {/* Body */}
       <View style={styles.body}>
         <Text style={[styles.name, { color: theme.textPrimary }]} numberOfLines={2}>
           {site.name}
         </Text>
-
         <Text style={[styles.meta, { color: theme.textSecondary }]} numberOfLines={1}>
-          {site.district} · {site.type}
+          {site.district}
         </Text>
 
-        {/* Era pill */}
-        <View style={[styles.eraPill, { backgroundColor: theme.brandLight }]}>
-          <Text style={[styles.eraPillText, { color: theme.brand }]}>{site.era}</Text>
+        {/* Type + era pills */}
+        <View style={styles.pills}>
+          <View style={[styles.typePill, { backgroundColor: bar + '22' }]}>
+            <Text style={[styles.typePillText, { color: bar }]}>{site.type}</Text>
+          </View>
+          <View style={[styles.eraPill, { backgroundColor: theme.brandLight }]}>
+            <Text style={[styles.eraPillText, { color: theme.brand }]}>{site.era}</Text>
+          </View>
         </View>
 
         {/* Status badges */}
         {(site.unesco || isFavourite || isVisited) && (
           <View style={styles.badges}>
-            {site.unesco   && <Badge label="UNESCO ★"  color={theme.accent}  bg={theme.accentLight} />}
-            {isFavourite   && <Badge label="♥ Saved"   color={theme.brand}   bg={theme.brandLight} />}
-            {isVisited     && <Badge label="✓ Visited"  color={theme.textSecondary} bg={theme.separator} />}
+            {site.unesco  && <Badge label="★ UNESCO"  color={theme.accent}        bg={theme.accentLight} />}
+            {isFavourite  && <Badge label="♥ Saved"   color={theme.brand}         bg={theme.brandLight}  />}
+            {isVisited    && <Badge label="✓ Visited"  color={theme.textSecondary} bg={theme.separator}   />}
           </View>
         )}
       </View>
 
-      {/* Chevron hint */}
+      {/* Chevron */}
       <Text style={[styles.chevron, { color: theme.textMuted }]}>›</Text>
     </Pressable>
   );
@@ -76,26 +89,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     overflow: 'hidden',
-    // iOS shadow
     ...Platform.select({
-      ios: {
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 2,
-      },
+      ios:     { shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.10, shadowRadius: 8 },
+      android: { elevation: 3 },
     }),
   },
-  cardPressed: {
-    opacity: 0.82,
-    transform: [{ scale: 0.985 }],
-  },
+  cardPressed: { opacity: 0.80, transform: [{ scale: 0.985 }] },
 
-  // Left accent bar
   accent: {
-    width: 52,
+    width: 54,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
@@ -103,63 +105,29 @@ const styles = StyleSheet.create({
   accentLetter: {
     color: '#FFFFFF',
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
 
-  // Body
-  body: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: '700',
-    lineHeight: 20,
-    letterSpacing: 0.1,
-  },
-  meta: {
-    marginTop: 3,
-    fontSize: 13,
-    lineHeight: 18,
-  },
+  body:   { flex: 1, paddingVertical: 12, paddingHorizontal: 12 },
+  name:   { fontSize: 15, fontWeight: '700', lineHeight: 20 },
+  meta:   { marginTop: 2, fontSize: 13 },
 
-  // Era pill
+  pills: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 7, gap: 6 },
+  typePill: {
+    paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999,
+  },
+  typePillText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.2 },
   eraPill: {
-    alignSelf: 'flex-start',
-    marginTop: 6,
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 999,
+    paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999,
   },
-  eraPillText: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
+  eraPillText: { fontSize: 10, fontWeight: '700' },
 
-  // Badges row
-  badges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 7,
-    gap: 5,
-  },
+  badges: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 6, gap: 5 },
   badge: {
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    fontSize: 11,
-    fontWeight: '700',
-    overflow: 'hidden',
+    paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999,
+    fontSize: 11, fontWeight: '700', overflow: 'hidden',
   },
 
-  // Chevron
-  chevron: {
-    alignSelf: 'center',
-    fontSize: 22,
-    paddingHorizontal: 10,
-    marginRight: 2,
-  },
+  chevron: { alignSelf: 'center', fontSize: 22, paddingHorizontal: 10 },
 });

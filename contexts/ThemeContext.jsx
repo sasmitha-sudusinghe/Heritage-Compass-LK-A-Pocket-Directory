@@ -3,77 +3,91 @@
 import { createContext, useContext, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
-// ─── Sri Lankan Heritage palette ──────────────────────────────────────────────
+// ─── Heritage Compass palette (matched from the design mockup) ─────────────────
 //
-//  Light: warm parchment background, saffron-gold brand, deep-teak headers.
-//  Dark:  charcoal background, burnished-gold brand, midnight-teak chrome.
+//  Light
+//    Background  warm sandy cream  #F5E6C8
+//    Brand       warm amber-gold   #C87800  (tab active pill, "View All", accents)
+//    Text        deep rich brown   #3D1A00
+//    Header      same cream as bg  — home screen has no nav header; other tabs
+//                                    use a cream header to blend with the bg.
+//    Tab bar     dark rich brown   #4A1E00
+//    Tab active  golden pill       #C87800
+//
+//  Category tile colours (also used as SiteCard accent bars):
+//    Temples       maroon red    #8B2020
+//    Ancient Cities forest green #1E5C3A
+//    Forts         amber gold    #B8820A
+//    Monuments     dark teal     #1E5C5C
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LIGHT = {
   // ── backgrounds
-  bg: '#FDF8F0',          // warm parchment
-  card: '#FFFFFF',
-  inputBg: '#F5EDE0',     // slightly warmer than bg for inputs
+  bg:      '#F5E6C8',   // warm sandy cream — the whole-screen background
+  card:    '#FFFFFF',   // card surfaces
+  inputBg: '#FFFFFF',   // search / input background (white lifts from cream bg)
 
   // ── text
-  textPrimary: '#1E0F05',   // deep espresso
-  textSecondary: '#6B3F20', // warm brown
-  textMuted: '#A07850',     // muted terracotta
+  textPrimary:   '#3D1A00',   // deep rich brown
+  textSecondary: '#6B3A1E',   // medium warm brown
+  textMuted:     '#A07850',   // muted tan
 
-  // ── brand (saffron / temple gold)
-  brand: '#B8600A',         // main saffron
-  brandDark: '#8B4508',     // pressed state
-  brandLight: '#FEF0D6',    // badge bg / chip bg
+  // ── brand — amber gold
+  brand:       '#C87800',
+  brandDark:   '#A05E00',
+  brandLight:  '#FEF3DC',
+  brandOnDark: '#FFFFFF',   // white text on any solid-colour header/bg
 
-  // ── accent: heritage green (UNESCO only)
-  accent: '#1D6B40',
-  accentLight: '#E6F4EC',
+  // ── accent — heritage green (UNESCO badges, nature sites)
+  accent:      '#1E5C3A',
+  accentLight: '#E4F0EA',
 
   // ── borders & separators
-  border: '#EDD9B8',        // warm sand
-  separator: '#F0E4CC',
+  border:    '#E0C898',
+  separator: '#EDD8A8',
 
-  // ── header / nav chrome
-  headerBg: '#1E0F05',      // deep teak
-  headerText: '#FDF8F0',
+  // ── header / nav chrome  (cream — blends with the warm bg on non-home tabs)
+  headerBg:   '#F5E6C8',
+  headerText: '#3D1A00',
 
-  // ── tab bar
-  tabBarBg: '#FFFFFF',
-  tabBarBorder: '#EDD9B8',
-  tabActive: '#B8600A',
-  tabInactive: '#A07850',
+  // ── tab bar  (dark brown from the mockup)
+  tabBarBg:     '#4A1E00',
+  tabBarBorder: '#3A1600',
+  tabActive:    '#C87800',   // golden active pill
+  tabInactive:  '#D4A880',   // warm tan for inactive icons/labels
 
-  // ── card shadow colour (iOS shadow / Android elevation tint)
+  // ── card shadow
   cardShadow: '#8B6240',
 };
 
 const DARK = {
-  bg: '#140A03',
-  card: '#241208',
-  inputBg: '#1C0E06',
+  bg:      '#1A0A00',
+  card:    '#2C1408',
+  inputBg: '#1A0A00',
 
-  textPrimary: '#F5EDD8',
-  textSecondary: '#C9966A',
-  textMuted: '#7A5538',
+  textPrimary:   '#F5E6C8',
+  textSecondary: '#D4A880',
+  textMuted:     '#8A6240',
 
-  brand: '#D4842A',
-  brandDark: '#B86C18',
-  brandLight: '#3D1E08',
+  brand:       '#E09020',
+  brandDark:   '#C87800',
+  brandLight:  '#3D1E00',
+  brandOnDark: '#F5E6C8',
 
-  accent: '#2DA05E',
-  accentLight: '#0B2D1C',
+  accent:      '#2E8A56',
+  accentLight: '#0E2A1A',
 
-  border: '#3A1E0A',
-  separator: '#2C1508',
+  border:    '#3D2010',
+  separator: '#2C1408',
 
-  headerBg: '#0E0702',
-  headerText: '#F5EDD8',
+  headerBg:   '#1A0A00',
+  headerText: '#F5E6C8',
 
-  tabBarBg: '#1A0C04',
-  tabBarBorder: '#3A1E0A',
-  tabActive: '#D4842A',
-  tabInactive: '#7A5538',
+  tabBarBg:     '#120600',
+  tabBarBorder: '#2C1408',
+  tabActive:    '#E09020',
+  tabInactive:  '#8A6240',
 
   cardShadow: 'transparent',
 };
@@ -86,7 +100,7 @@ export function ThemeProvider({ children }) {
   const [override, setOverride] = useState(null); // null | 'light' | 'dark'
 
   const scheme = override ?? systemScheme ?? 'light';
-  const theme = scheme === 'dark' ? DARK : LIGHT;
+  const theme  = scheme === 'dark' ? DARK : LIGHT;
 
   function toggleTheme() {
     setOverride((current) => {
