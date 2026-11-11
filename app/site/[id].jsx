@@ -1,9 +1,9 @@
 // app/site/[id].jsx — Site Detail.
-// Expo Router fills `id` from the URL segment; we find the matching site in
-// sites.json and display every field. The header title updates dynamically.
-// The Stack.Screen in app/_layout.jsx keeps this route out of the tab bar.
+// useLocalSearchParams provides `id`; we find the site in sites.json.
+// The Stack header title updates dynamically.
 import { useCallback, useLayoutEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Stack, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
 
 import sites from '../../data/sites.json';
@@ -15,26 +15,70 @@ import {
 } from '../../utils/storage';
 import { useTheme } from '../../contexts/ThemeContext';
 
-// A labelled field row.
-function Field({ label, value, theme }) {
+// A single information card (label + value).
+function InfoCard({ label, value, iconName, theme }) {
   return (
-    <View style={styles.field}>
-      <Text style={[styles.label, { color: theme.brand }]}>{label}</Text>
-      <Text style={[styles.value, { color: theme.textPrimary }]}>{value}</Text>
+    <View style={[ic.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+      <View style={ic.top}>
+        {iconName && (
+          <Ionicons name={iconName} size={15} color={theme.brand} style={ic.icon} />
+        )}
+        <Text style={[ic.label, { color: theme.brand }]}>{label}</Text>
+      </View>
+      <Text style={[ic.value, { color: theme.textPrimary }]}>{value}</Text>
     </View>
   );
 }
+const ic = StyleSheet.create({
+  card:  {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    ...Platform.select({ ios: { shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4 } }),
+  },
+  top:   { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
+  icon:  { marginRight: 5 },
+  label: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.6 },
+  value: { fontSize: 15, lineHeight: 22 },
+});
+
+// Icon+label action button.
+function ActionBtn({ iconName, label, active, onPress, theme }) {
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        ab.btn,
+        { borderColor: theme.brand, backgroundColor: active ? theme.brand : theme.card },
+        pressed && { opacity: 0.75 },
+      ]}
+      onPress={onPress}
+    >
+      <Ionicons
+        name={iconName}
+        size={17}
+        color={active ? '#FFFFFF' : theme.brand}
+        style={ab.icon}
+      />
+      <Text style={[ab.label, { color: active ? '#FFFFFF' : theme.brand }]}>{label}</Text>
+    </Pressable>
+  );
+}
+const ab = StyleSheet.create({
+  btn:   { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14, marginRight: 10, marginBottom: 8 },
+  icon:  { marginRight: 6 },
+  label: { fontSize: 14, fontWeight: '700' },
+});
 
 export default function SiteDetailScreen() {
   const { theme } = useTheme();
-  const { id } = useLocalSearchParams();
+  const { id }    = useLocalSearchParams();
   const navigation = useNavigation();
 
   const site = sites.find((item) => item.id === id);
   const [isFavourite, setIsFavourite] = useState(false);
-  const [isVisited, setIsVisited] = useState(false);
+  const [isVisited,   setIsVisited]   = useState(false);
 
-  // Update the Stack header title once we know the site name.
   useLayoutEffect(() => {
     navigation.setOptions({ title: site?.name ?? 'Site' });
   }, [navigation, site]);
@@ -56,7 +100,6 @@ export default function SiteDetailScreen() {
     const ids = await toggleFavourite(site.id);
     setIsFavourite(ids.includes(site.id));
   }
-
   async function onToggleVisited() {
     const ids = await toggleVisited(site.id);
     setIsVisited(ids.includes(site.id));
@@ -65,7 +108,8 @@ export default function SiteDetailScreen() {
   if (!site) {
     return (
       <View style={[styles.missing, { backgroundColor: theme.bg }]}>
-        <Text style={{ color: theme.textSecondary, fontSize: 16 }}>
+        <Ionicons name="alert-circle-outline" size={40} color={theme.textMuted} />
+        <Text style={[styles.missingText, { color: theme.textSecondary }]}>
           This site is not in the offline directory.
         </Text>
       </View>
@@ -74,89 +118,114 @@ export default function SiteDetailScreen() {
 
   return (
     <>
-      {/* Override the Stack header colours to follow the theme. */}
       <Stack.Screen
         options={{
           title: site.name,
           headerStyle: { backgroundColor: theme.headerBg },
           headerTintColor: theme.headerText,
+          headerTitleStyle: { fontWeight: '700' },
         }}
       />
 
-      <ScrollView
-        style={{ flex: 1, backgroundColor: theme.bg }}
-        contentContainerStyle={styles.content}
-      >
-        {/* Colour swatch — replaced by a real image in a later step. */}
-        <View style={[styles.swatch, { backgroundColor: theme.brand }]}>
-          <Text style={styles.swatchText}>{site.name.slice(0, 1)}</Text>
+      <ScrollView style={{ flex: 1, backgroundColor: theme.bg }} contentContainerStyle={styles.content}>
+
+        {/* ── Hero swatch (placeholder until real images are added) ── */}
+        <View style={[styles.hero, { backgroundColor: theme.headerBg }]}>
+          {/* Large initial */}
+          <Text style={[styles.heroLetter, { color: theme.brand }]}>
+            {site.name.slice(0, 1)}
+          </Text>
+          {/* Era pill overlay */}
+          <View style={[styles.eraPill, { backgroundColor: theme.brand }]}>
+            <Text style={styles.eraPillText}>{site.era} era</Text>
+          </View>
+          {/* UNESCO ribbon */}
+          {site.unesco && (
+            <View style={[styles.unescoRibbon, { backgroundColor: theme.accent }]}>
+              <Text style={styles.unescoText}>UNESCO World Heritage ★</Text>
+            </View>
+          )}
         </View>
 
-        <Text style={[styles.name, { color: theme.textPrimary }]}>{site.name}</Text>
-        <Text style={[styles.meta, { color: theme.textSecondary }]}>
-          {site.district} · {site.type} · {site.era}
-        </Text>
+        {/* ── Name & meta ── */}
+        <View style={styles.nameWrap}>
+          <Text style={[styles.name, { color: theme.textPrimary }]}>{site.name}</Text>
+          <Text style={[styles.meta, { color: theme.textSecondary }]}>
+            {site.district} · {site.type}
+          </Text>
+        </View>
 
+        {/* ── Action buttons ── */}
         <View style={styles.actions}>
-          <Pressable
-            style={[styles.action, { borderColor: theme.brand, backgroundColor: isFavourite ? theme.brand : theme.card }]}
+          <ActionBtn
+            iconName={isFavourite ? 'heart' : 'heart-outline'}
+            label={isFavourite ? 'Saved' : 'Save'}
+            active={isFavourite}
             onPress={onToggleFavourite}
-          >
-            <Text style={[styles.actionText, { color: isFavourite ? '#F7F3EA' : theme.brand }]}>
-              {isFavourite ? 'Remove favourite' : 'Save favourite'}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.action, { borderColor: theme.brand, backgroundColor: isVisited ? theme.brand : theme.card }]}
+            theme={theme}
+          />
+          <ActionBtn
+            iconName={isVisited ? 'checkmark-circle' : 'checkmark-circle-outline'}
+            label={isVisited ? 'Visited' : 'Mark visited'}
+            active={isVisited}
             onPress={onToggleVisited}
-          >
-            <Text style={[styles.actionText, { color: isVisited ? '#F7F3EA' : theme.brand }]}>
-              {isVisited ? 'Unmark visited' : 'Mark visited'}
-            </Text>
-          </Pressable>
+            theme={theme}
+          />
         </View>
 
-        <Field label="Open hours"  value={site.openHours}             theme={theme} />
-        <Field label="Entry fee"   value={site.entryFee}              theme={theme} />
-        <Field label="Description" value={site.description}           theme={theme} />
-        <Field label="Etiquette"   value={site.etiquette}             theme={theme} />
-        <Field label="UNESCO"      value={site.unesco ? 'Yes' : 'No'} theme={theme} />
-        <Field label="Image file"  value={site.image}                 theme={theme} />
+        {/* ── Info cards ── */}
+        <InfoCard label="Description"  value={site.description}           iconName="book-outline"           theme={theme} />
+        <InfoCard label="Open hours"   value={site.openHours}             iconName="time-outline"            theme={theme} />
+        <InfoCard label="Entry fee"    value={site.entryFee}              iconName="ticket-outline"          theme={theme} />
+        <InfoCard label="Etiquette"    value={site.etiquette}             iconName="hand-left-outline"       theme={theme} />
       </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  missing: { flex: 1, padding: 24, justifyContent: 'center' },
-  content: { padding: 16, paddingBottom: 40 },
-  swatch: {
-    height: 120,
-    borderRadius: 12,
+  missing: { flex: 1, padding: 32, alignItems: 'center', justifyContent: 'center' },
+  missingText: { marginTop: 12, fontSize: 16, textAlign: 'center' },
+
+  content: { paddingBottom: 48 },
+
+  // Hero
+  hero: {
+    height: 180,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    overflow: 'hidden',
   },
-  swatchText: { color: '#F7F3EA', fontSize: 48, fontWeight: '700' },
-  name: { fontSize: 26, fontWeight: '700' },
-  meta: { marginTop: 4, fontSize: 15 },
-  actions: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 16 },
-  action: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 10,
+  heroLetter: {
+    fontSize: 80,
+    fontWeight: '900',
+    opacity: 0.4,
+  },
+  eraPill: {
+    position: 'absolute',
+    bottom: 14,
+    right: 14,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  eraPillText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
+  unescoRibbon: {
+    position: 'absolute',
+    top: 14,
+    left: 0,
+    paddingVertical: 4,
     paddingHorizontal: 12,
-    marginRight: 8,
-    marginBottom: 8,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
   },
-  actionText: { fontWeight: '700' },
-  field: { marginTop: 16 },
-  label: {
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  value: { marginTop: 4, fontSize: 16, lineHeight: 22 },
-});
+  unescoText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
 
+  // Name
+  nameWrap: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 4 },
+  name: { fontSize: 24, fontWeight: '800', lineHeight: 30 },
+  meta: { marginTop: 4, fontSize: 14 },
+
+  // Actions
+  actions: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, marginTop: 12, marginBottom: 8 },
+});

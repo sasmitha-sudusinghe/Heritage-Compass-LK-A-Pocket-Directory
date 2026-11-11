@@ -3,41 +3,79 @@
 import { createContext, useContext, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
-// ─── colour tokens ────────────────────────────────────────────────────────────
+// ─── Sri Lankan Heritage palette ──────────────────────────────────────────────
+//
+//  Light: warm parchment background, saffron-gold brand, deep-teak headers.
+//  Dark:  charcoal background, burnished-gold brand, midnight-teak chrome.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
 const LIGHT = {
-  // backgrounds
-  bg: '#F7F3EA',
+  // ── backgrounds
+  bg: '#FDF8F0',          // warm parchment
   card: '#FFFFFF',
-  // text
-  textPrimary: '#3D2914',
-  textSecondary: '#5C4632',
-  textMuted: '#8A7560',
-  // brand / accent
-  brand: '#8B4513',
-  brandLight: '#F3E6D4',
-  // borders & UI chrome
-  border: '#E6D7C3',
-  headerBg: '#3D2914',
-  headerText: '#F7F3EA',
-  tabBarBg: '#F7F3EA',
-  tabActive: '#8B4513',
-  tabInactive: '#8A7560',
+  inputBg: '#F5EDE0',     // slightly warmer than bg for inputs
+
+  // ── text
+  textPrimary: '#1E0F05',   // deep espresso
+  textSecondary: '#6B3F20', // warm brown
+  textMuted: '#A07850',     // muted terracotta
+
+  // ── brand (saffron / temple gold)
+  brand: '#B8600A',         // main saffron
+  brandDark: '#8B4508',     // pressed state
+  brandLight: '#FEF0D6',    // badge bg / chip bg
+
+  // ── accent: heritage green (UNESCO only)
+  accent: '#1D6B40',
+  accentLight: '#E6F4EC',
+
+  // ── borders & separators
+  border: '#EDD9B8',        // warm sand
+  separator: '#F0E4CC',
+
+  // ── header / nav chrome
+  headerBg: '#1E0F05',      // deep teak
+  headerText: '#FDF8F0',
+
+  // ── tab bar
+  tabBarBg: '#FFFFFF',
+  tabBarBorder: '#EDD9B8',
+  tabActive: '#B8600A',
+  tabInactive: '#A07850',
+
+  // ── card shadow colour (iOS shadow / Android elevation tint)
+  cardShadow: '#8B6240',
 };
 
 const DARK = {
-  bg: '#1A1008',
-  card: '#2C1A0E',
-  textPrimary: '#F7F3EA',
-  textSecondary: '#D4B896',
-  textMuted: '#8A7560',
-  brand: '#C87941',
-  brandLight: '#3D2914',
-  border: '#3D2914',
-  headerBg: '#2C1A0E',
-  headerText: '#F7F3EA',
-  tabBarBg: '#2C1A0E',
-  tabActive: '#C87941',
-  tabInactive: '#8A7560',
+  bg: '#140A03',
+  card: '#241208',
+  inputBg: '#1C0E06',
+
+  textPrimary: '#F5EDD8',
+  textSecondary: '#C9966A',
+  textMuted: '#7A5538',
+
+  brand: '#D4842A',
+  brandDark: '#B86C18',
+  brandLight: '#3D1E08',
+
+  accent: '#2DA05E',
+  accentLight: '#0B2D1C',
+
+  border: '#3A1E0A',
+  separator: '#2C1508',
+
+  headerBg: '#0E0702',
+  headerText: '#F5EDD8',
+
+  tabBarBg: '#1A0C04',
+  tabBarBorder: '#3A1E0A',
+  tabActive: '#D4842A',
+  tabInactive: '#7A5538',
+
+  cardShadow: 'transparent',
 };
 
 // ─── context ──────────────────────────────────────────────────────────────────
@@ -45,7 +83,6 @@ const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const systemScheme = useColorScheme(); // 'light' | 'dark' | null
-  // Track whether the user has manually overridden the system scheme.
   const [override, setOverride] = useState(null); // null | 'light' | 'dark'
 
   const scheme = override ?? systemScheme ?? 'light';
@@ -53,7 +90,6 @@ export function ThemeProvider({ children }) {
 
   function toggleTheme() {
     setOverride((current) => {
-      // If overriding, flip it; if following system, flip away from system.
       const active = current ?? systemScheme ?? 'light';
       return active === 'light' ? 'dark' : 'light';
     });
@@ -74,4 +110,3 @@ export function useTheme() {
   }
   return ctx;
 }
-
