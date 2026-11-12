@@ -8,7 +8,8 @@
 //
 // No navigation header — the tab layout sets headerShown: false for this screen.
 // Safe-area top inset is handled with useSafeAreaInsets().
-
+   import { Image } from 'react-native'   // merge into your existing react-native import
+   import images from '../../data/images' // path from app/(tabs)/index.jsx
 import { useCallback, useRef, useState } from 'react';
 import {
   Dimensions,

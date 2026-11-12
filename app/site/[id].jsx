@@ -3,11 +3,12 @@
 // Hero uses the category tile colour for this site's type.
 // A real photo (ImageBackground) replaces the coloured swatch in a later step.
 import { useCallback, useLayoutEffect, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
 
 import sites from '../../data/sites.json';
+import images from '../../data/images';
 import {
   getFavouriteIds,
   getVisitedIds,
@@ -143,7 +144,11 @@ export default function SiteDetailScreen() {
 
         {/* ── Hero (category colour + site initial; replaced by photo later) ── */}
         <View style={[styles.hero, { backgroundColor: heroColor }]}>
-          <Text style={styles.heroLetter}>{site.name.slice(0, 1)}</Text>
+          {images[site.image] ? (
+  <Image source={images[site.image]} style={styles.heroImage} resizeMode="cover" />
+) : (
+  <Text style={styles.heroLetter}>{site.name.slice(0, 1)}</Text>
+)}
 
           {/* Era pill */}
           <View style={styles.eraPill}>
@@ -211,6 +216,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   heroLetter:   { fontSize: 90, fontWeight: '900', color: 'rgba(255,255,255,0.25)' },
+  heroImage: { ...StyleSheet.absoluteFill, width: '100%', height: '100%' },
   eraPill: {
     position: 'absolute', bottom: 14, right: 14,
     backgroundColor: 'rgba(0,0,0,0.35)',
