@@ -8,12 +8,11 @@
 //
 // No navigation header — the tab layout sets headerShown: false for this screen.
 // Safe-area top inset is handled with useSafeAreaInsets().
-   import { Image } from 'react-native'   // merge into your existing react-native import
-   import images from '../../data/images' // path from app/(tabs)/index.jsx
 import { useCallback, useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -27,6 +26,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import sites from '../../data/sites.json';
+import images from '../../data/images';
 import { getFavouriteIds, getVisitedIds } from '../../utils/storage';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -143,7 +143,7 @@ const ct = StyleSheet.create({
 
 // ── Featured site card (large, horizontal scroll) ─────────────────────────────
 function FeaturedCard({ site, onPress, isFavourite, isVisited }) {
-  const CARD_W = SCREEN_W * 0.82;
+  const CARD_W = 300;
   return (
     <Pressable
       style={({ pressed }) => [fc.card, { width: CARD_W }, pressed && { opacity: 0.88 }]}
@@ -151,8 +151,12 @@ function FeaturedCard({ site, onPress, isFavourite, isVisited }) {
     >
       {/* Photo placeholder — ImageBackground goes here when photos arrive */}
       <View style={[fc.photo, { backgroundColor: '#8B6240' }]}>
-        <Text style={fc.photoLetter}>{site.name.slice(0, 1)}</Text>
-      </View>
+  {images[site.image] ? (
+    <Image source={images[site.image]} style={fc.photoImage} resizeMode="cover" />
+  ) : (
+    <Text style={fc.photoLetter}>{site.name.slice(0, 1)}</Text>
+  )}
+</View>
 
       {/* Dark overlay + text at the bottom */}
       <View style={fc.overlay}>
@@ -181,11 +185,11 @@ function FeaturedCard({ site, onPress, isFavourite, isVisited }) {
 }
 const fc = StyleSheet.create({
   card: {
-    marginRight: 14,
-    borderRadius: 16,
-    overflow: 'hidden',
-    height: 200,
-    backgroundColor: '#8B6240',
+  marginRight: 14,
+  borderRadius: 16,
+  overflow: 'hidden',
+  height: 220,          // was 200
+  backgroundColor: '#8B6240',
     ...Platform.select({
       ios:     { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 10, shadowColor: '#3D1A00' },
       android: { elevation: 5 },
@@ -201,6 +205,7 @@ const fc = StyleSheet.create({
     fontSize: 80,
     fontWeight: '900',
   },
+  photoImage: { width: '100%', height: '100%' },
   overlay: {
     position: 'absolute',
     left: 0,

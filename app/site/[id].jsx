@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   content:     { paddingBottom: 48 },
 
   hero: {
-    height: 200,
+    height: 300,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
