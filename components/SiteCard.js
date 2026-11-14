@@ -2,9 +2,10 @@
 // The left accent bar colour matches the category tile colours from the mockup.
 // Pressing the card springs it forward (scale + lift) via use3DPress().
 
-import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image,Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { use3DPress } from '../utils/use3DPress';
+import images from '../data/images';
 
 // ── Per-type accent colours — match the 4 category tile colours ───────────────
 const TYPE_COLORS = {
@@ -55,9 +56,13 @@ export default function SiteCard({ site, onPress, isFavourite, isVisited }) {
         onPressOut={onPressOut}
       >
         {/* Left accent bar */}
-        <View style={[styles.accent, { backgroundColor: bar }]}>
-          <Text style={styles.accentLetter}>{site.name.slice(0, 1)}</Text>
-        </View>
+        <View style={[styles.thumb, { backgroundColor: getBarColor(site.type) }]}>
+  {images[site.image] ? (
+    <Image source={images[site.image]} style={{ width: 90, height: '100%' }} resizeMode="cover" />
+  ) : (
+    <Text style={styles.thumbLetter}>{site.name.slice(0, 1)}</Text>
+  )}
+</View>
 
         {/* Body */}
         <View style={styles.body}>
@@ -120,12 +125,13 @@ const styles = StyleSheet.create({
   },
 
   accent: {
-    width: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-  },
-  accentLetter: { color: '#FFFFFF', fontSize: 20, fontWeight: '900', letterSpacing: 0.5 },
+  width: 90,                     
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflow: 'hidden',             // clips the photo to the strip
+},
+accentImage: {...StyleSheet.absoluteFillObject},
+accentLetter: { color: '#FFFFFF', fontSize: 20, fontWeight: '900', letterSpacing: 0.5 },
 
   body:   { flex: 1, paddingVertical: 12, paddingHorizontal: 12 },
   name:   { fontSize: 15, fontWeight: '700', lineHeight: 20 },
