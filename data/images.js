@@ -1,4 +1,21 @@
 export default {
   'sigiriya.jpg': require('../assets/sites/sigiriya.jpg'),
-  'temple-of-the-tooth.jpg': require('../assets/sites/temple-of-the-tooth.jpg')
+  'temple-of-the-tooth.jpg': require('../assets/sites/temple-of-the-tooth.jpg'),
+  'galle-fort.jpg': require('../assets/sites/galle-fort.jpg'),
+  'dambulla-cave-temple.jpg': require('../assets/sites/dambulla-cave-temple.jpg'),
+  'sri-maha-bodhi.jpg': require('../assets/sites/sri-maha-bodhi.jpg'),
+  'ruwanwelisaya.jpg': require('../assets/sites/ruwanwelisaya.jpg'),
+  'jetavanaramaya.jpg': require('../assets/sites/jetavanaramaya.jpg'),
+  'thuparamaya.jpg': require('../assets/sites/thuparamaya.jpg'),
+  'isurumuniya.jpg': require('../assets/sites/isurumuniya.jpg'),
+  'mihintale.jpg': require('../assets/sites/mihintale.jpg'),
+  'gal-vihara.jpg': require('../assets/sites/gal-vihara.jpg'),
+  'polonnaruwa-vatadage.jpg': require('../assets/sites/polonnaruwa-vatadage.jpg'),
+  'jaffna-fort.jpg': require('../assets/sites/jaffna-fort.jpg'),
+  'nallur-kandaswamy.jpg': require('../assets/sites/nallur-kandaswamy.jpg'),
+  'koneswaram.jpg': require('../assets/sites/koneswaram.jpg'),
+  'jami-ul-alfar.jpg': require('../assets/sites/jami-ul-alfar.jpg'),
+  'kechimalai.jpg': require('../assets/sites/kechimalai.jpg'),
+  'yapahuwa.jpg': require('../assets/sites/yapahuwa.jpg'),
+  
 }
