@@ -9,6 +9,8 @@
 // No navigation header — the tab layout sets headerShown: false for this screen.
 // Safe-area top inset is handled with useSafeAreaInsets().
 import { useCallback, useRef, useState } from 'react';
+import { Animated } from 'react-native';
+import { use3DPress } from '../../utils/use3DPress';
 import {
   Dimensions,
   FlatList,
@@ -112,24 +114,47 @@ const hs = StyleSheet.create({
 
 // ── Category tile ─────────────────────────────────────────────────────────────
 function CategoryTile({ item, onPress }) {
+  const { onPressIn, onPressOut, animatedStyle } = use3DPress({
+    scaleTo: 1.07,
+    liftPx:  10,
+    tension: 380,
+    friction: 6,
+  });
+
   return (
-    <Pressable
-      style={({ pressed }) => [ct.tile, { backgroundColor: item.color }, pressed && { opacity: 0.82 }]}
-      onPress={() => onPress(item.typeFilter)}
-    >
-      <Ionicons name={item.icon} size={30} color="#FFFFFF" />
-      <Text style={ct.label}>{item.label}</Text>
-    </Pressable>
+    <Animated.View style={[ct.wrapper, animatedStyle]}>
+      <Pressable
+        style={[ct.tile, { backgroundColor: item.color }]}
+        onPress={() => onPress(item.typeFilter)}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+      >
+        <Ionicons name={item.icon} size={30} color="#FFFFFF" />
+        <Text style={ct.label}>{item.label}</Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 const ct = StyleSheet.create({
-  tile: {
+  wrapper: {
     flex: 1,
     marginHorizontal: 5,
+    // iOS shadow on wrapper so it lifts with the card
+    ...Platform.select({
+      ios: {
+        shadowColor: '#3D1A00',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.20,
+        shadowRadius: 10,
+      },
+    }),
+  },
+  tile: {
     borderRadius: 14,
     paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    ...Platform.select({ android: { elevation: 5 } }),
   },
   label: {
     color: '#FFFFFF',
@@ -144,56 +169,67 @@ const ct = StyleSheet.create({
 // ── Featured site card (large, horizontal scroll) ─────────────────────────────
 function FeaturedCard({ site, onPress, isFavourite, isVisited }) {
   const CARD_W = 300;
+  const { onPressIn, onPressOut, animatedStyle } = use3DPress({
+    scaleTo: 1.04,
+    liftPx:  10,
+    tension: 360,
+    friction: 7,
+  });
+
   return (
-    <Pressable
-      style={({ pressed }) => [fc.card, { width: CARD_W }, pressed && { opacity: 0.88 }]}
-      onPress={() => onPress(site)}
-    >
-      {/* Photo placeholder — ImageBackground goes here when photos arrive */}
-      <View style={[fc.photo, { backgroundColor: '#8B6240' }]}>
-  {images[site.image] ? (
-    <Image source={images[site.image]} style={fc.photoImage} resizeMode="cover" />
-  ) : (
-    <Text style={fc.photoLetter}>{site.name.slice(0, 1)}</Text>
-  )}
-</View>
-
-      {/* Dark overlay + text at the bottom */}
-      <View style={fc.overlay}>
-        <Text style={fc.siteName} numberOfLines={1}>{site.name}</Text>
-        <View style={fc.districtRow}>
-          <Ionicons name="location-outline" size={12} color="#E0C898" style={{ marginRight: 4 }} />
-          <Text style={fc.district}>{site.district} District</Text>
+    <Animated.View style={[{ width: CARD_W, marginRight: 14 }, animatedStyle,
+      Platform.select({
+        ios: { shadowColor: '#3D1A00', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 14 },
+      }),
+    ]}>
+      <Pressable
+        style={fc.card}
+        onPress={() => onPress(site)}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+      >
+        {/* Photo placeholder — replace with ImageBackground when photos arrive */}
+        <View style={[fc.photo, { backgroundColor: '#8B6240' }]}>
+          {images[site.image] ? (
+            <Image source={images[site.image]} style={fc.photoImage} resizeMode="cover" />
+          ) : (
+            <Text style={fc.photoLetter}>{site.name.slice(0, 1)}</Text>
+          )}
         </View>
-      </View>
 
-      {/* Chevron button bottom-right */}
-      <View style={fc.chevronWrap}>
-        <Ionicons name="chevron-forward" size={18} color="#3D1A00" />
-      </View>
-
-      {/* Badges */}
-      {(isFavourite || isVisited || site.unesco) && (
-        <View style={fc.badges}>
-          {site.unesco   && <Text style={fc.badge}>★ UNESCO</Text>}
-          {isFavourite   && <Text style={fc.badge}>♥</Text>}
-          {isVisited     && <Text style={fc.badge}>✓</Text>}
+        {/* Dark overlay + text */}
+        <View style={fc.overlay}>
+          <Text style={fc.siteName} numberOfLines={1}>{site.name}</Text>
+          <View style={fc.districtRow}>
+            <Ionicons name="location-outline" size={12} color="#E0C898" style={{ marginRight: 4 }} />
+            <Text style={fc.district}>{site.district} District</Text>
+          </View>
         </View>
-      )}
-    </Pressable>
+
+        {/* Chevron button */}
+        <View style={fc.chevronWrap}>
+          <Ionicons name="chevron-forward" size={18} color="#3D1A00" />
+        </View>
+
+        {/* Badges */}
+        {(isFavourite || isVisited || site.unesco) && (
+          <View style={fc.badges}>
+            {site.unesco && <Text style={fc.badge}>★ UNESCO</Text>}
+            {isFavourite && <Text style={fc.badge}>♥</Text>}
+            {isVisited   && <Text style={fc.badge}>✓</Text>}
+          </View>
+        )}
+      </Pressable>
+    </Animated.View>
   );
 }
 const fc = StyleSheet.create({
   card: {
-  marginRight: 14,
-  borderRadius: 16,
-  overflow: 'hidden',
-  height: 220,          // was 200
-  backgroundColor: '#8B6240',
-    ...Platform.select({
-      ios:     { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 10, shadowColor: '#3D1A00' },
-      android: { elevation: 5 },
-    }),
+    borderRadius: 16,
+    overflow: 'hidden',
+    height: 220,
+    backgroundColor: '#8B6240',
+    ...Platform.select({ android: { elevation: 6 } }),
   },
   photo: {
     ...StyleSheet.absoluteFillObject,
