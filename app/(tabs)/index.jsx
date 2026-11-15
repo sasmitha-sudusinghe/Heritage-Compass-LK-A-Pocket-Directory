@@ -8,13 +8,11 @@
 //
 // No navigation header — the tab layout sets headerShown: false for this screen.
 // Safe-area top inset is handled with useSafeAreaInsets().
-import { useCallback, useRef, useState } from 'react';
-import { Animated } from 'react-native';
-import { use3DPress } from '../../utils/use3DPress';
 import {
   Dimensions,
   FlatList,
   Image,
+  ImageBackground,
   Platform,
   Pressable,
   ScrollView,
@@ -23,6 +21,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useCallback, useRef, useState } from 'react';
+import { Animated } from 'react-native';
+import { use3DPress } from '../../utils/use3DPress';
+
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -364,13 +367,21 @@ export default function HomeScreen() {
               <ImageBackground source={require('../../assets/hero.jpg')} style={s.hero} resizeMode="cover">
             For now we use a warm tone-on-tone coloured view.
           */}
-          <View style={s.heroContent}>
-            <Text style={s.heroTitle}>Discover{'\n'}Sri Lanka's{'\n'}Heritage</Text>
-            <View style={s.heroUnderline} />
-            <Text style={s.heroSub}>
-              Explore ancient cities, sacred temples,{'\n'}historic forts and cultural treasures.
-            </Text>
-          </View>
+          {/* ── 2. Hero section ── */}
+<ImageBackground source={images['sigiriya.jpg']} style={s.hero} imageStyle={{ width: '100%', height: '100%' }} resizeMode="cover">
+  <LinearGradient
+    colors={['rgba(18,10,5,0.15)', 'rgba(18,10,5,0.92)']}
+    style={StyleSheet.absoluteFill}
+  />
+  <View style={s.heroContent}>
+    <Text style={s.heroKicker}>SRI LANKA</Text>
+    <Text style={s.heroTitle}>Discover{'\n'}Sri Lanka's{'\n'}Heritage</Text>
+    <View style={s.heroUnderline} />
+    <Text style={s.heroSub}>
+      Explore ancient cities, sacred temples,{'\n'}historic forts and cultural treasures.
+    </Text>
+  </View>
+</ImageBackground>
         </View>
 
         {/* Search bar overlaps hero bottom */}
@@ -475,21 +486,21 @@ function makeStyles(theme) {
 
     // Hero
     hero: {
-      backgroundColor: '#D4A060',   // warm golden-sand placeholder; swap for ImageBackground + photo
-      minHeight: 200,
-      justifyContent: 'flex-end',
-    },
-    heroContent: {
-      paddingHorizontal: 20,
-      paddingTop: 24,
-      paddingBottom: 24,
-      backgroundColor: 'rgba(245,220,170,0.55)', // warm translucent overlay
-    },
+  height: 300,                 // fixed height, so the photo can't grow
+  overflow: 'hidden',          // clips the photo to this box only
+  justifyContent: 'flex-end',
+},
+heroKicker: { color: '#E8A33D', fontSize: 12, fontWeight: '800', letterSpacing: 3, marginBottom: 6 },
+heroContent: {
+  paddingHorizontal: 20,
+  paddingTop: 24,
+  paddingBottom: 40,
+},
     heroTitle: {
-      fontSize: 32,
+      fontSize: 34,
       fontWeight: '900',
-      color: '#3D1A00',
-      lineHeight: 38,
+      color: '#FFF3DC',
+      lineHeight: 40,
       letterSpacing: 0.1,
     },
     heroUnderline: {
@@ -499,11 +510,7 @@ function makeStyles(theme) {
       backgroundColor: '#C87800',
       marginVertical: 10,
     },
-    heroSub: {
-      fontSize: 14,
-      color: '#5C3010',
-      lineHeight: 20,
-    },
+    heroSub: { fontSize: 14, color: '#E6D3B0', lineHeight: 20 },
 
     // Category tiles
     section:  { paddingHorizontal: 16, marginTop: 20 },
