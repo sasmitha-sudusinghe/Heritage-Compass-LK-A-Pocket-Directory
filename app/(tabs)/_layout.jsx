@@ -1,17 +1,14 @@
 // app/(tabs)/_layout.jsx — the bottom tab bar.
-// Matches the design mockup:
-//   - Dark rich-brown tab bar (#4A1E00)
-//   - Active tab: golden rounded pill with white icon
-//   - Inactive tabs: warm-tan icons + labels
-//   - Home tab has NO nav header (content is inside the ScrollView)
-//   - Other tabs: cream-coloured header to blend with the warm bg
-import { Pressable, StyleSheet, View } from 'react-native';
+// Uses custom AnimatedTabBar with sliding active highlight pill.
+
+import { Pressable, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTheme } from '../../contexts/ThemeContext';
+import AnimatedTabBar from '../../components/AnimatedTabBar';
 
-// Tab icons  [focused-name, unfocused-name]  — icons from the mockup
+// Tab icons [focused-name, unfocused-name] — icons from the mockup
 const ICONS = {
   index:      ['home',    'home-outline'],
   browse:     ['compass', 'compass-outline'],
@@ -43,10 +40,13 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      tabBar={(props) => <AnimatedTabBar {...props} />}
       screenOptions={({ route }) => {
         const [filled, outline] = ICONS[route.name] ?? ['ellipse', 'ellipse-outline'];
 
         return {
+          animation: 'shift',
+
           // ── Header (cream background to blend with the warm app bg)
           headerStyle:       { backgroundColor: theme.headerBg },
           headerTintColor:   theme.headerText,
@@ -54,27 +54,10 @@ export default function TabLayout() {
           headerShadowVisible: false,
           headerRight: () => <ThemeToggle />,
 
-          // ── Tab bar
-          tabBarStyle: {
-            backgroundColor: theme.tabBarBg,
-            borderTopWidth: 0,
-            height: 68,
-            paddingTop: 6,
-            paddingBottom: 10,
-          },
-          tabBarActiveTintColor:   '#FFFFFF',       // white label on active tab
-          tabBarInactiveTintColor: theme.tabInactive,
-          tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
-
-          // ── Active icon: golden rounded pill  (matches mockup exactly)
-          tabBarIcon: ({ focused, color, size }) =>
-            focused ? (
-              <View style={[styles.activePill, { backgroundColor: theme.tabActive }]}>
-                <Ionicons name={filled} size={size - 1} color="#FFFFFF" />
-              </View>
-            ) : (
-              <Ionicons name={outline} size={size - 1} color={color} />
-            ),
+          // ── Tab icon for AnimatedTabBar
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? filled : outline} size={size ?? 22} color={color} />
+          ),
         };
       }}
     >
@@ -83,7 +66,7 @@ export default function TabLayout() {
         name="index"
         options={{ title: 'Home', headerShown: false }}
       />
-      {/* Renamed Browse → Explore  &  Favourites → Favorites */}
+      {/* Renamed Browse → Explore & Favourites → Favorites */}
       <Tabs.Screen name="browse"     options={{ title: 'Explore' }} />
       <Tabs.Screen name="favourites" options={{ title: 'Favorites' }} />
       <Tabs.Screen name="categories" options={{ title: 'Categories' }} />
@@ -94,13 +77,4 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   toggleBtn: { marginRight: 16, padding: 4 },
-
-  // Golden pill for the active tab icon — matches mockup
-  activePill: {
-    width: 52,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });
