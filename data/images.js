@@ -17,5 +17,11 @@ export default {
   'jami-ul-alfar.jpg': require('../assets/sites/jami-ul-alfar.jpg'),
   'kechimalai.jpg': require('../assets/sites/kechimalai.jpg'),
   'yapahuwa.jpg': require('../assets/sites/yapahuwa.jpg'),
-  
+  'lankatilaka.jpg': require('../assets/sites/lankatilaka.jpg'),
+  'embekke.jpg': require('../assets/sites/embekke.jpg'),
+  'buduruwagala.jpg': require('../assets/sites/buduruwagala.jpg'),
+  'tissamaharama.jpg': require('../assets/sites/tissamaharama.jpg'),
+  'star-fort-matara.jpg': require('../assets/sites/star-fort-matara.jpg'),
+  'wolvendaal.jpg': require('../assets/sites/wolvendaal.jpg'),
+  'rankoth-vehera.jpg': require('../assets/sites/rankoth-vehera.jpg'),
 }
