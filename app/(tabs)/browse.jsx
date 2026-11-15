@@ -55,12 +55,14 @@ export default function BrowseScreen() {
   const params = useLocalSearchParams();
   const [query,      setQuery]      = useState('');
   const [type,       setType]       = useState('All');
+  const [era,        setEra]        = useState('All');
   const [district,   setDistrict]   = useState('All');
   const [unescoOnly, setUnescoOnly] = useState(false);
   const [sortBy,     setSortBy]     = useState('name');
   const [favouriteIds, setFavouriteIds] = useState([]);
   const [visitedIds,   setVisitedIds]   = useState([]);
 
+  // Read ?type param from Categories / Home navigation
   const lastType = useRef(null);
   useEffect(() => {
     if (params.type && params.type !== lastType.current) {
@@ -68,6 +70,15 @@ export default function BrowseScreen() {
       setType(params.type);
     }
   }, [params.type]);
+
+  // Read ?era param from Categories navigation
+  const lastEra = useRef(null);
+  useEffect(() => {
+    if (params.era && params.era !== lastEra.current) {
+      lastEra.current = params.era;
+      setEra(params.era);
+    }
+  }, [params.era]);
 
   useFocusEffect(
     useCallback(() => {
@@ -88,6 +99,7 @@ export default function BrowseScreen() {
       return (
         (!needle || hay.includes(needle)) &&
         (type === 'All' || s.type === type) &&
+        (era === 'All' || s.era === era) &&
         (district === 'All' || s.district === district) &&
         (!unescoOnly || s.unesco)
       );
@@ -142,6 +154,15 @@ export default function BrowseScreen() {
         <Chip label="All" selected={type === 'All'} onPress={() => setType('All')} theme={theme} />
         {uniqueValues('type').map((v) => (
           <Chip key={v} label={v} selected={type === v} onPress={() => setType(v)} theme={theme} />
+        ))}
+      </ScrollView>
+
+      {/* Era */}
+      <FilterLabel title="ERA" theme={theme} />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <Chip label="All" selected={era === 'All'} onPress={() => setEra('All')} theme={theme} />
+        {uniqueValues('era').map((v) => (
+          <Chip key={v} label={v} selected={era === v} onPress={() => setEra(v)} theme={theme} />
         ))}
       </ScrollView>
 
