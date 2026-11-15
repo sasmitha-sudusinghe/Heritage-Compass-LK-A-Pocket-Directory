@@ -16,7 +16,6 @@ An offline React Native (Expo) app that works as a pocket directory of Sri Lanka
 |------------|------------|-------|
 | ![Favourites](screenshots/favorite.jpeg) | ![Categories](screenshots/categories.jpeg) | ![About](screenshots/about.jpeg) |
 
-*(Add your own screenshots to a `screenshots/` folder and update the file names above.)*
 
 ---
 
