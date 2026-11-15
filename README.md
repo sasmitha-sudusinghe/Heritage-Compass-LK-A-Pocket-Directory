@@ -136,8 +136,8 @@ The app makes no network requests. Site data and images are bundled with the app
 ## Author
 
 **<Sasmitha Sudusinghe>**
-Index No: `<2022/ICT/15`
-GitHub: [@sasmitha-sudusinghe](https://github.com/<sasmitha-sudusinghe>)
+Index No: `2022/ICT/15`
+GitHub: [@sasmitha-sudusinghe](https://github.com/sasmitha-sudusinghe)
 
 ---
 
