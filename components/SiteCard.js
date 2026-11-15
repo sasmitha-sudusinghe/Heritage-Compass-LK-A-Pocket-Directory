@@ -55,12 +55,12 @@ export default function SiteCard({ site, onPress, isFavourite, isVisited }) {
         onPressIn={onPressIn}
         onPressOut={onPressOut}
       >
-        {/* Left accent bar */}
-        <View style={[styles.thumb, { backgroundColor: getBarColor(site.type) }]}>
+        {/* Left photo strip */}
+<View style={[styles.accent, { backgroundColor: getBarColor(site.type) }]}>
   {images[site.image] ? (
-    <Image source={images[site.image]} style={{ width: 90, height: '100%' }} resizeMode="cover" />
+    <Image source={images[site.image]} style={styles.accentImage} resizeMode="cover" />
   ) : (
-    <Text style={styles.thumbLetter}>{site.name.slice(0, 1)}</Text>
+    <Text style={styles.accentLetter}>{site.name.slice(0, 1)}</Text>
   )}
 </View>
 
@@ -115,24 +115,22 @@ const styles = StyleSheet.create({
     }),
   },
   card: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    borderRadius: 14,
-    borderWidth: 1,
-    overflow: 'hidden',
-    // Android elevation on the card itself
-    ...Platform.select({ android: { elevation: 4 } }),
-  },
-
-  accent: {
-  width: 90,                     
+  flexDirection: 'row',
+  alignItems: 'stretch',
+  height: 110,
+  borderRadius: 14,
+  borderWidth: 1,
+  overflow: 'hidden',
+  ...Platform.select({ android: { elevation: 4 } }),
+},
+accent: {
+  width: 90,
   alignItems: 'center',
   justifyContent: 'center',
-  overflow: 'hidden',             // clips the photo to the strip
+  overflow: 'hidden',
 },
-accentImage: {...StyleSheet.absoluteFillObject},
+accentImage: { ...StyleSheet.absoluteFillObject },
 accentLetter: { color: '#FFFFFF', fontSize: 20, fontWeight: '900', letterSpacing: 0.5 },
-
   body:   { flex: 1, paddingVertical: 12, paddingHorizontal: 12 },
   name:   { fontSize: 15, fontWeight: '700', lineHeight: 20 },
   meta:   { marginTop: 2, fontSize: 13 },
