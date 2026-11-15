@@ -135,9 +135,9 @@ The app makes no network requests. Site data and images are bundled with the app
 
 ## Author
 
-**<Your Name>**
-Index No: `<your index number>`
-GitHub: [@your-username](https://github.com/<your-username>)
+**<Sasmitha Sudusinghe>**
+Index No: `<2022/ICT/15`
+GitHub: [@sasmitha-sudusinghe](https://github.com/<sasmitha-sudusinghe>)
 
 ---
 
