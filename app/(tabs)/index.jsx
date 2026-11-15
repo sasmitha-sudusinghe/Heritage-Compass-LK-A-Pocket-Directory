@@ -50,30 +50,10 @@ const FEATURED_IDS = [
 // Colors + icons match the mockup exactly.
 // `typeFilter` is passed to Browse as the ?type param.
 const CATEGORIES = [
-  {
-    label: 'Temples',
-    icon: 'business-outline',
-    color: '#8B2020',      // maroon red
-    typeFilter: 'Buddhist Temple',
-  },
-  {
-    label: 'Ancient\nCities',
-    icon: 'map-outline',
-    color: '#1E5C3A',      // forest green
-    typeFilter: 'Archaeological Site',
-  },
-  {
-    label: 'Forts',
-    icon: 'shield-outline',
-    color: '#B8820A',      // amber gold
-    typeFilter: 'Fort',
-  },
-  {
-    label: 'Monuments',
-    icon: 'ribbon-outline',
-    color: '#1E5C5C',      // dark teal
-    typeFilter: 'Monument',
-  },
+  { label: 'Temples',        icon: 'business-outline', color: '#8B2020', typeFilter: 'Buddhist Temple',     image: 'temple-of-the-tooth.jpg' },
+  { label: 'Ancient\nCities', icon: 'map-outline',      color: '#1E5C3A', typeFilter: 'Archaeological Site', image: 'sigiriya.jpg' },
+  { label: 'Forts',          icon: 'shield-outline',   color: '#B8820A', typeFilter: 'Fort',                image: 'galle-fort.jpg' },
+  { label: 'Kovils',         icon: 'flower-outline',   color: '#1E5C5C', typeFilter: 'Hindu Kovil',         image: 'nallur-kandaswamy.jpg' },
 ];
 
 // ── Hero search box ───────────────────────────────────────────────────────────
@@ -123,17 +103,31 @@ function CategoryTile({ item, onPress }) {
     tension: 380,
     friction: 6,
   });
+  const count = sites.filter((s) => s.type === item.typeFilter).length;
 
   return (
     <Animated.View style={[ct.wrapper, animatedStyle]}>
       <Pressable
-        style={[ct.tile, { backgroundColor: item.color }]}
+        style={ct.tile}
         onPress={() => onPress(item.typeFilter)}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
       >
-        <Ionicons name={item.icon} size={30} color="#FFFFFF" />
-        <Text style={ct.label}>{item.label}</Text>
+        <ImageBackground
+          source={images[item.image]}
+          style={[ct.bg, { backgroundColor: item.color }]}
+          resizeMode="cover"
+        >
+          <LinearGradient
+            colors={[item.color + '55', item.color + 'F2']}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={ct.iconCircle}>
+            <Ionicons name={item.icon} size={22} color="#FFFFFF" />
+          </View>
+          <Text style={ct.label}>{item.label}</Text>
+          <Text style={ct.count}>{count} {count === 1 ? 'site' : 'sites'}</Text>
+        </ImageBackground>
       </Pressable>
     </Animated.View>
   );
@@ -153,11 +147,17 @@ const ct = StyleSheet.create({
     }),
   },
   tile: {
-    borderRadius: 14,
-    paddingVertical: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 124,
+    borderRadius: 18,
+    overflow: 'hidden',
     ...Platform.select({ android: { elevation: 5 } }),
+  },
+  bg: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 8 },
+  iconCircle: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.4)',
+    alignItems: 'center', justifyContent: 'center',
   },
   label: {
     color: '#FFFFFF',
@@ -165,8 +165,10 @@ const ct = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     marginTop: 8,
-    letterSpacing: 0.2,
+    minHeight: 28,
+    letterSpacing: 0.3,
   },
+   count: { color: 'rgba(255,255,255,0.8)', fontSize: 10, fontWeight: '700', marginTop: 2 },
 });
 
 // ── Featured site card (large, horizontal scroll) ─────────────────────────────
